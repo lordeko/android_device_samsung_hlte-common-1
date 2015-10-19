@@ -1,4 +1,4 @@
-/* Copyright (c) 2013, The Linux Foundation. All rights reserved.
+/* Copyright (c) 2011-2013, The Linux Foundation. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are
@@ -26,41 +26,10 @@
  * IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
  */
-#ifndef ULP_PROXY_BASE_H
-#define ULP_PROXY_BASE_H
 
-#include <gps_extended.h>
+#define LOG_NDDEBUG 0
+#define LOG_TAG "LocSvc_eng"
 
-namespace loc_core {
+#include "loc_log.h"
+#include "loc_eng_log.h"
 
-class LocAdapterBase;
-
-class UlpProxyBase {
-public:
-    inline UlpProxyBase() {}
-    inline virtual ~UlpProxyBase() {}
-    inline virtual bool sendStartFix() { return false;}
-    inline virtual bool sendStopFix() { return false;}
-    inline virtual bool sendFixMode(LocPosMode &params) { return false;}
-    inline virtual bool reportPosition(UlpLocation &location,
-                                       GpsLocationExtended &locationExtended,
-                                       void* locationExt,
-                                       enum loc_sess_status status,
-                                       LocPosTechMask loc_technology_mask) {
-        return false;
-    }
-    inline virtual bool reportSv(GpsSvStatus &svStatus,
-                                 GpsLocationExtended &locationExtended,
-                                 void* svExt) {
-        return false;
-    }
-    inline virtual bool reportStatus(GpsStatusValue status) {
-        return false;
-    }
-    inline virtual void setAdapter(LocAdapterBase* adapter) {}
-    inline virtual void setCapabilities(unsigned long capabilities) {}
-};
-
-} // namespace loc_core
-
-#endif // ULP_PROXY_BASE_H

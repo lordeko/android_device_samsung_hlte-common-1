@@ -1,4 +1,4 @@
-/* Copyright (c) 2013, The Linux Foundation. All rights reserved.
+/* Copyright (c) 2011 The Linux Foundation. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are
@@ -9,7 +9,7 @@
  *       copyright notice, this list of conditions and the following
  *       disclaimer in the documentation and/or other materials provided
  *       with the distribution.
- *     * Neither the name of The Linux Foundation, nor the names of its
+ *     * Neither the name of The Linux Foundation nor the names of its
  *       contributors may be used to endorse or promote products derived
  *       from this software without specific prior written permission.
  *
@@ -26,41 +26,47 @@
  * IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
  */
-#ifndef ULP_PROXY_BASE_H
-#define ULP_PROXY_BASE_H
 
-#include <gps_extended.h>
+#include "hardware/gps.h"
 
-namespace loc_core {
+#include <stdlib.h>
 
-class LocAdapterBase;
+extern const GpsInterface* get_gps_interface();
 
-class UlpProxyBase {
-public:
-    inline UlpProxyBase() {}
-    inline virtual ~UlpProxyBase() {}
-    inline virtual bool sendStartFix() { return false;}
-    inline virtual bool sendStopFix() { return false;}
-    inline virtual bool sendFixMode(LocPosMode &params) { return false;}
-    inline virtual bool reportPosition(UlpLocation &location,
-                                       GpsLocationExtended &locationExtended,
-                                       void* locationExt,
-                                       enum loc_sess_status status,
-                                       LocPosTechMask loc_technology_mask) {
-        return false;
-    }
-    inline virtual bool reportSv(GpsSvStatus &svStatus,
-                                 GpsLocationExtended &locationExtended,
-                                 void* svExt) {
-        return false;
-    }
-    inline virtual bool reportStatus(GpsStatusValue status) {
-        return false;
-    }
-    inline virtual void setAdapter(LocAdapterBase* adapter) {}
-    inline virtual void setCapabilities(unsigned long capabilities) {}
+const GpsInterface* gps__get_gps_interface(struct gps_device_t* dev)
+{
+    return get_gps_interface();
+}
+
+static int open_gps(const struct hw_module_t* module, char const* name,
+        struct hw_device_t** device)
+{
+    struct gps_device_t *dev = (struct gps_device_t *) malloc(sizeof(struct gps_device_t));
+
+    if(dev == NULL)
+        return -1;
+
+    memset(dev, 0, sizeof(*dev));
+
+    dev->common.tag = HARDWARE_DEVICE_TAG;
+    dev->common.version = 0;
+    dev->common.module = (struct hw_module_t*)module;
+    dev->get_gps_interface = gps__get_gps_interface;
+
+    *device = (struct hw_device_t*)dev;
+    return 0;
+}
+
+static struct hw_module_methods_t gps_module_methods = {
+    .open = open_gps
 };
 
-} // namespace loc_core
-
-#endif // ULP_PROXY_BASE_H
+struct hw_module_t HAL_MODULE_INFO_SYM = {
+    .tag = HARDWARE_MODULE_TAG,
+    .module_api_version = 1,
+    .hal_api_version = 0,
+    .id = GPS_HARDWARE_MODULE_ID,
+    .name = "loc_api GPS Module",
+    .author = "Qualcomm USA, Inc.",
+    .methods = &gps_module_methods,
+};

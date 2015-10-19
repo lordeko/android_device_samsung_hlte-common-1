@@ -1,4 +1,4 @@
-/* Copyright (c) 2013, The Linux Foundation. All rights reserved.
+/* Copyright (c) 2009,2011 The Linux Foundation. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are
@@ -9,7 +9,7 @@
  *       copyright notice, this list of conditions and the following
  *       disclaimer in the documentation and/or other materials provided
  *       with the distribution.
- *     * Neither the name of The Linux Foundation, nor the names of its
+ *     * Neither the name of The Linux Foundation nor the names of its
  *       contributors may be used to endorse or promote products derived
  *       from this software without specific prior written permission.
  *
@@ -26,41 +26,25 @@
  * IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
  */
-#ifndef ULP_PROXY_BASE_H
-#define ULP_PROXY_BASE_H
 
-#include <gps_extended.h>
+#ifndef LOC_ENG_NI_H
+#define LOC_ENG_NI_H
 
-namespace loc_core {
+#include <stdbool.h>
 
-class LocAdapterBase;
+#define LOC_NI_NO_RESPONSE_TIME            20                      /* secs */
+#define LOC_NI_NOTIF_KEY_ADDRESS           "Address"
 
-class UlpProxyBase {
-public:
-    inline UlpProxyBase() {}
-    inline virtual ~UlpProxyBase() {}
-    inline virtual bool sendStartFix() { return false;}
-    inline virtual bool sendStopFix() { return false;}
-    inline virtual bool sendFixMode(LocPosMode &params) { return false;}
-    inline virtual bool reportPosition(UlpLocation &location,
-                                       GpsLocationExtended &locationExtended,
-                                       void* locationExt,
-                                       enum loc_sess_status status,
-                                       LocPosTechMask loc_technology_mask) {
-        return false;
-    }
-    inline virtual bool reportSv(GpsSvStatus &svStatus,
-                                 GpsLocationExtended &locationExtended,
-                                 void* svExt) {
-        return false;
-    }
-    inline virtual bool reportStatus(GpsStatusValue status) {
-        return false;
-    }
-    inline virtual void setAdapter(LocAdapterBase* adapter) {}
-    inline virtual void setCapabilities(unsigned long capabilities) {}
-};
+typedef struct {
+    pthread_t               thread;            /* NI thread */
+    int                     respTimeLeft;       /* examine time for NI response */
+    bool                    respRecvd;   /* NI User reponse received or not from Java layer*/
+    void*                   rawRequest;
+    int                     reqID;         /* ID to check against response */
+    GpsUserResponseType     resp;
+    pthread_cond_t          tCond;
+    pthread_mutex_t         tLock;
+} loc_eng_ni_data_s_type;
 
-} // namespace loc_core
 
-#endif // ULP_PROXY_BASE_H
+#endif /* LOC_ENG_NI_H */

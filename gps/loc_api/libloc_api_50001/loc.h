@@ -1,4 +1,4 @@
-/* Copyright (c) 2013, The Linux Foundation. All rights reserved.
+/* Copyright (c) 2011-2013, The Linux Foundation. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are
@@ -26,41 +26,39 @@
  * IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
  */
-#ifndef ULP_PROXY_BASE_H
-#define ULP_PROXY_BASE_H
 
+#ifndef __LOC_H__
+#define __LOC_H__
+
+#ifdef __cplusplus
+extern "C" {
+#endif /* __cplusplus */
+
+#include <ctype.h>
+#include <cutils/properties.h>
+#include "hardware/gps.h"
 #include <gps_extended.h>
 
-namespace loc_core {
+typedef void (*loc_location_cb_ext) (UlpLocation* location, void* locExt);
+typedef void (*loc_sv_status_cb_ext) (GpsSvStatus* sv_status, void* svExt);
+typedef void* (*loc_ext_parser)(void* data);
 
-class LocAdapterBase;
+typedef struct {
+    loc_location_cb_ext location_cb;
+    gps_status_callback status_cb;
+    loc_sv_status_cb_ext sv_status_cb;
+    gps_nmea_callback nmea_cb;
+    gps_set_capabilities set_capabilities_cb;
+    gps_acquire_wakelock acquire_wakelock_cb;
+    gps_release_wakelock release_wakelock_cb;
+    gps_create_thread create_thread_cb;
+    loc_ext_parser location_ext_parser;
+    loc_ext_parser sv_ext_parser;
+    gps_request_utc_time request_utc_time_cb;
+} LocCallbacks;
 
-class UlpProxyBase {
-public:
-    inline UlpProxyBase() {}
-    inline virtual ~UlpProxyBase() {}
-    inline virtual bool sendStartFix() { return false;}
-    inline virtual bool sendStopFix() { return false;}
-    inline virtual bool sendFixMode(LocPosMode &params) { return false;}
-    inline virtual bool reportPosition(UlpLocation &location,
-                                       GpsLocationExtended &locationExtended,
-                                       void* locationExt,
-                                       enum loc_sess_status status,
-                                       LocPosTechMask loc_technology_mask) {
-        return false;
-    }
-    inline virtual bool reportSv(GpsSvStatus &svStatus,
-                                 GpsLocationExtended &locationExtended,
-                                 void* svExt) {
-        return false;
-    }
-    inline virtual bool reportStatus(GpsStatusValue status) {
-        return false;
-    }
-    inline virtual void setAdapter(LocAdapterBase* adapter) {}
-    inline virtual void setCapabilities(unsigned long capabilities) {}
-};
+#ifdef __cplusplus
+}
+#endif /* __cplusplus */
 
-} // namespace loc_core
-
-#endif // ULP_PROXY_BASE_H
+#endif //__LOC_H__

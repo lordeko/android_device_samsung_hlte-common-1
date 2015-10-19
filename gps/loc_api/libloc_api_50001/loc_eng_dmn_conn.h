@@ -1,4 +1,4 @@
-/* Copyright (c) 2013, The Linux Foundation. All rights reserved.
+/* Copyright (c) 2011-2012, The Linux Foundation. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are
@@ -26,41 +26,34 @@
  * IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
  */
-#ifndef ULP_PROXY_BASE_H
-#define ULP_PROXY_BASE_H
+#ifndef LOC_ENG_DATA_SERVER_H
+#define LOC_ENG_DATA_SERVER_H
 
-#include <gps_extended.h>
+#include "loc_eng_dmn_conn_thread_helper.h"
 
-namespace loc_core {
+#ifdef _ANDROID_
 
-class LocAdapterBase;
+#define GPSONE_LOC_API_Q_PATH "/data/misc/gpsone_d/gpsone_loc_api_q"
+#define GPSONE_LOC_API_RESP_Q_PATH "/data/misc/gpsone_d/gpsone_loc_api_resp_q"
+#define QUIPC_CTRL_Q_PATH "/data/misc/gpsone_d/quipc_ctrl_q"
+#define MSAPM_CTRL_Q_PATH "/data/misc/gpsone_d/msapm_ctrl_q"
+#define MSAPU_CTRL_Q_PATH "/data/misc/gpsone_d/msapu_ctrl_q"
 
-class UlpProxyBase {
-public:
-    inline UlpProxyBase() {}
-    inline virtual ~UlpProxyBase() {}
-    inline virtual bool sendStartFix() { return false;}
-    inline virtual bool sendStopFix() { return false;}
-    inline virtual bool sendFixMode(LocPosMode &params) { return false;}
-    inline virtual bool reportPosition(UlpLocation &location,
-                                       GpsLocationExtended &locationExtended,
-                                       void* locationExt,
-                                       enum loc_sess_status status,
-                                       LocPosTechMask loc_technology_mask) {
-        return false;
-    }
-    inline virtual bool reportSv(GpsSvStatus &svStatus,
-                                 GpsLocationExtended &locationExtended,
-                                 void* svExt) {
-        return false;
-    }
-    inline virtual bool reportStatus(GpsStatusValue status) {
-        return false;
-    }
-    inline virtual void setAdapter(LocAdapterBase* adapter) {}
-    inline virtual void setCapabilities(unsigned long capabilities) {}
-};
+#else
 
-} // namespace loc_core
+#define GPSONE_LOC_API_Q_PATH "/tmp/gpsone_loc_api_q"
+#define GPSONE_LOC_API_RESP_Q_PATH "/tmp/gpsone_loc_api_resp_q"
+#define QUIPC_CTRL_Q_PATH "/tmp/quipc_ctrl_q"
+#define MSAPM_CTRL_Q_PATH "/tmp/msapm_ctrl_q"
+#define MSAPU_CTRL_Q_PATH "/tmp/msapu_ctrl_q"
 
-#endif // ULP_PROXY_BASE_H
+#endif
+
+int loc_eng_dmn_conn_loc_api_server_launch(thelper_create_thread   create_thread_cb,
+    const char * loc_api_q_path, const char * ctrl_q_path, void *agps_handle);
+int loc_eng_dmn_conn_loc_api_server_unblock(void);
+int loc_eng_dmn_conn_loc_api_server_join(void);
+int loc_eng_dmn_conn_loc_api_server_data_conn(int, int);
+
+#endif /* LOC_ENG_DATA_SERVER_H */
+

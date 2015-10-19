@@ -1,4 +1,4 @@
-/* Copyright (c) 2013, The Linux Foundation. All rights reserved.
+/* Copyright (c) 2011, The Linux Foundation. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are
@@ -9,7 +9,7 @@
  *       copyright notice, this list of conditions and the following
  *       disclaimer in the documentation and/or other materials provided
  *       with the distribution.
- *     * Neither the name of The Linux Foundation, nor the names of its
+ *     * Neither the name of The Linux Foundation nor the names of its
  *       contributors may be used to endorse or promote products derived
  *       from this software without specific prior written permission.
  *
@@ -26,41 +26,26 @@
  * IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
  */
-#ifndef ULP_PROXY_BASE_H
-#define ULP_PROXY_BASE_H
+#ifndef LOC_ENG_DMN_CONN_GLUE_MSG_H
+#define LOC_ENG_DMN_CONN_GLUE_MSG_H
 
-#include <gps_extended.h>
+#ifdef __cplusplus
+extern "C" {
+#endif /* __cplusplus */
 
-namespace loc_core {
 
-class LocAdapterBase;
+#include <linux/types.h>
+#include "loc_eng_dmn_conn_glue_pipe.h"
 
-class UlpProxyBase {
-public:
-    inline UlpProxyBase() {}
-    inline virtual ~UlpProxyBase() {}
-    inline virtual bool sendStartFix() { return false;}
-    inline virtual bool sendStopFix() { return false;}
-    inline virtual bool sendFixMode(LocPosMode &params) { return false;}
-    inline virtual bool reportPosition(UlpLocation &location,
-                                       GpsLocationExtended &locationExtended,
-                                       void* locationExt,
-                                       enum loc_sess_status status,
-                                       LocPosTechMask loc_technology_mask) {
-        return false;
-    }
-    inline virtual bool reportSv(GpsSvStatus &svStatus,
-                                 GpsLocationExtended &locationExtended,
-                                 void* svExt) {
-        return false;
-    }
-    inline virtual bool reportStatus(GpsStatusValue status) {
-        return false;
-    }
-    inline virtual void setAdapter(LocAdapterBase* adapter) {}
-    inline virtual void setCapabilities(unsigned long capabilities) {}
-};
+int loc_eng_dmn_conn_glue_msgget(const char * q_path, int mode);
+int loc_eng_dmn_conn_glue_msgremove(const char * q_path, int msgqid);
+int loc_eng_dmn_conn_glue_msgsnd(int msgqid, const void * msgp, size_t msgsz);
+int loc_eng_dmn_conn_glue_msgrcv(int msgqid, void *msgp, size_t msgsz);
+int loc_eng_dmn_conn_glue_msgflush(int msgqid);
+int loc_eng_dmn_conn_glue_msgunblock(int msgqid);
 
-} // namespace loc_core
+#ifdef __cplusplus
+}
+#endif /* __cplusplus */
 
-#endif // ULP_PROXY_BASE_H
+#endif /* LOC_ENG_DMN_CONN_GLUE_MSG_H */
